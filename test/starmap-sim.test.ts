@@ -3,7 +3,7 @@ import {
   advanceAsteroidBelts,
   advanceOrbitingObjects,
   advancePlanetOrbits,
-} from '@/starmap/sim/orbits';
+} from '@/sim/orbits';
 
 describe('starmap simulation', () => {
   it('advances planet and moon orbits using dt and scale', () => {

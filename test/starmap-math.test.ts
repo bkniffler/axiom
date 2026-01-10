@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { mixRgb } from '@/starmap/math/color';
-import { smoothFactor } from '@/starmap/math/smoothing';
+import { mixRgb } from '@/math/color';
+import { smoothFactor } from '@/math/smoothing';
 
 describe('smoothFactor', () => {
   it('matches per-frame value at 60fps', () => {

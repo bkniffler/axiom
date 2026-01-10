@@ -1,45 +1,39 @@
 import type { Paint } from 'canvaskit-wasm';
-import { SkiaMenuStyle } from './SkiaMenu';
 import {
   createCamera,
   resetCamera,
   setCameraTarget,
   stepCamera,
-} from './starmap/camera/controller';
-import { worldToScreen } from './starmap/camera/transforms';
-import { hitTestStarMap } from './starmap/input/hitTest';
-import { smoothFactor } from './starmap/math/smoothing';
-import { drawAsteroidBelts } from './starmap/render/passes/asteroidBelts';
-import { drawCentralStar } from './starmap/render/passes/centralStar';
-import { drawDeepSpaceObjects } from './starmap/render/passes/deepSpaceObjects';
-import { drawPlanetInfoPanel } from './starmap/render/passes/infoPanel';
-import { drawOrbitingObjects } from './starmap/render/passes/orbitingObjects';
-import { drawOrbitPaths } from './starmap/render/passes/orbitPaths';
-import {
-  drawParticles,
-  type Particle,
-} from './starmap/render/passes/particles';
-import {
-  drawPlanetHoverLabel,
-  drawPlanets,
-} from './starmap/render/passes/planets';
-import { drawScanlines } from './starmap/render/passes/scanlines';
-import { drawStars } from './starmap/render/passes/stars';
-import { drawZoomIndicator } from './starmap/render/passes/zoomIndicator';
-import { SkiaPixelRenderer } from './starmap/render/SkiaPixelRenderer';
-import { BlackoutShader } from './starmap/shaders/BlackoutShader';
-import { NebulaShader } from './starmap/shaders/NebulaShader';
-import { advanceComets } from './starmap/sim/deepSpace';
+} from './camera/controller';
+import { worldToScreen } from './camera/transforms';
+import { hitTestStarMap } from './input/hitTest';
+import { smoothFactor } from './math/smoothing';
+import { drawAsteroidBelts } from './render/passes/asteroidBelts';
+import { drawCentralStar } from './render/passes/centralStar';
+import { drawDeepSpaceObjects } from './render/passes/deepSpaceObjects';
+import { drawPlanetInfoPanel } from './render/passes/infoPanel';
+import { drawOrbitingObjects } from './render/passes/orbitingObjects';
+import { drawOrbitPaths } from './render/passes/orbitPaths';
+import { drawParticles, type Particle } from './render/passes/particles';
+import { drawPlanetHoverLabel, drawPlanets } from './render/passes/planets';
+import { drawScanlines } from './render/passes/scanlines';
+import { drawStars } from './render/passes/stars';
+import { drawZoomIndicator } from './render/passes/zoomIndicator';
+import { SkiaPixelRenderer } from './render/SkiaPixelRenderer';
+import { SkiaMenuStyle } from './SkiaMenu';
+import { BlackoutShader } from './shaders/BlackoutShader';
+import { NebulaShader } from './shaders/NebulaShader';
+import { advanceComets } from './sim/deepSpace';
 import {
   advanceAsteroidBelts,
   advanceOrbitingObjects,
   advancePlanetOrbits,
-} from './starmap/sim/orbits';
-import { stepParticles } from './starmap/sim/particles';
-import { spawnPlanetExplosionParticles } from './starmap/sim/particlesSpawn';
-import { TransferTrafficSystem } from './starmap/traffic/TransferTrafficSystem';
-import { measurePixelTextWidth } from './starmap/ui/pixelFont3x5';
-import { drawPixelText } from './starmap/ui/pixelTextDraw';
+} from './sim/orbits';
+import { stepParticles } from './sim/particles';
+import { spawnPlanetExplosionParticles } from './sim/particlesSpawn';
+import { TransferTrafficSystem } from './traffic/TransferTrafficSystem';
+import { measurePixelTextWidth } from './ui/pixelFont3x5';
+import { drawPixelText } from './ui/pixelTextDraw';
 
 interface Planet {
   name: string;
@@ -770,10 +764,7 @@ export class StarMapPixelStyle extends SkiaMenuStyle {
     }, 0);
 
     this.unlockMinRadius = Math.max(1, this.systemBaseOrbit * 1.1);
-    this.unlockMaxRadius = Math.max(
-      this.unlockMinRadius + 1,
-      Math.max(maxPlanet, maxBelt, maxOrbiting, maxDeep) * 1.05
-    );
+    this.unlockMaxRadius = Math.max(this.unlockMinRadius + 1);
 
     // Only set a default if the user/app hasn't already picked a radius.
     if (this.targetUnlockRadius <= 0) {

@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import {
-  createCamera,
-  setCameraTarget,
-  stepCamera,
-} from '@/starmap/camera/controller';
-import { worldToScreen } from '@/starmap/camera/transforms';
-import { hitTestStarMap } from '@/starmap/input/hitTest';
+import { createCamera, setCameraTarget, stepCamera } from '@/camera/controller';
+import { worldToScreen } from '@/camera/transforms';
+import { hitTestStarMap } from '@/input/hitTest';
 
 const screenToWorld = (
   sx: number,

@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { layoutPlanetInfoPanel } from '@/starmap/ui/infoPanelLayout';
-import {
-  measurePixelTextWidth,
-  wrapPixelText,
-} from '@/starmap/ui/pixelFont3x5';
+import { layoutPlanetInfoPanel } from '@/ui/infoPanelLayout';
+import { measurePixelTextWidth, wrapPixelText } from '@/ui/pixelFont3x5';
 
 describe('pixelFont3x5', () => {
   it('measures text width with fixed spacing', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { TransferTrafficSystem } from '@/starmap/traffic/TransferTrafficSystem';
+import { TransferTrafficSystem } from '@/traffic/TransferTrafficSystem';
 
 describe('TransferTrafficSystem', () => {
   it('keeps arrived ships attached to moving target planet', () => {
