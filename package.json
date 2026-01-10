@@ -28,8 +28,7 @@
         "@tauri-apps/api": "^2",
         "@tauri-apps/plugin-opener": "^2",
         "canvaskit-wasm": "^0.40.0",
-        "phaser": "^4.0.0-rc.6",
-        "pixi.js": "^8.15.0"
+        "phaser": "^4.0.0-rc.6"
     },
     "devDependencies": {
         "@tauri-apps/cli": "^2",
