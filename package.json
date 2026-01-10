@@ -6,10 +6,10 @@
     "packageManager": "bun@1.3.5",
     "scripts": {
       "up:external": "bunx npm-check-updates --dep prod,dev,optional,overrides --interactive --format group",
-        "dev": "node log.js dev & tauri dev",
+        "dev": "node dev & tauri dev",
         "dev-nolog": "tauri dev",
         "vite-dev": "vite",
-        "build": "node log.js build & tauri build",
+        "build": "node build & tauri build",
         "build-nolog": "tauri build",
         "vite-build": "tsc && vite build",
         "test": "bun test",

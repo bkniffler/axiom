@@ -18,7 +18,7 @@ interface BlackoutDrawParams {
   fade: number;
 }
 
-export function buildBlackoutUniforms(params: BlackoutDrawParams): number[] {
+function buildBlackoutUniforms(params: BlackoutDrawParams): number[] {
   return [
     params.width,
     params.height,

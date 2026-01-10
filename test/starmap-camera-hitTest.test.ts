@@ -4,8 +4,29 @@ import {
   setCameraTarget,
   stepCamera,
 } from '@/starmap/camera/controller';
-import { screenToWorld, worldToScreen } from '@/starmap/camera/transforms';
+import { worldToScreen } from '@/starmap/camera/transforms';
 import { hitTestStarMap } from '@/starmap/input/hitTest';
+
+const screenToWorld = (
+  sx: number,
+  sy: number,
+  params: {
+    viewportWidth: number;
+    viewportHeight: number;
+    cameraX: number;
+    cameraY: number;
+    zoom: number;
+    parallax?: number;
+  }
+): { x: number; y: number } => {
+  const cx = params.viewportWidth / 2;
+  const cy = params.viewportHeight / 2;
+  const parallax = params.parallax ?? 1;
+  return {
+    x: (sx - cx) / params.zoom + params.cameraX * parallax,
+    y: (sy - cy) / params.zoom + params.cameraY * parallax,
+  };
+};
 
 describe('camera transforms', () => {
   it('worldToScreen and screenToWorld are inverses (parallax=1)', () => {

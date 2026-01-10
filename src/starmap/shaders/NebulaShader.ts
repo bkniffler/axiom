@@ -17,7 +17,7 @@ interface NebulaDrawParams {
   fade: number;
 }
 
-export function buildNebulaUniforms(params: NebulaDrawParams): number[] {
+function buildNebulaUniforms(params: NebulaDrawParams): number[] {
   return [
     params.width,
     params.height,

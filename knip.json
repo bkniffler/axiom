@@ -5,11 +5,6 @@
     "src/main.ts!",
     "test/**/*.test.ts"
   ],
-  "project": [
-    "src/**/*.{ts,tsx}",
-    "test/**/*.{ts,tsx}",
-    "vite.config.ts"
-  ],
   "bun": true,
   "vite": true,
   "includeEntryExports": false,
@@ -21,8 +16,6 @@
     "src-tauri/gen/**",
     ".claude/**"
   ],
-  "ignoreDependencies": [
-    "bun-types"
-  ],
+  "ignoreDependencies": [],
   "ignoreBinaries": []
 }
