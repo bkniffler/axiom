@@ -1,4 +1,4 @@
-import { MenuCallbacks, SvgMenuStyle } from './SvgMenu';
+import { SvgMenuStyle } from './SvgMenu';
 
 export class ConcentricRingsStyle extends SvgMenuStyle {
   private rings: SVGCircleElement[] = [];

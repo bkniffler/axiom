@@ -212,7 +212,7 @@ class StrudelAudioManager {
     if (typeof hush === 'function') {
       try {
         hush();
-      } catch (e) {
+      } catch {
         // Ignore stop errors
       }
     }
@@ -225,7 +225,7 @@ class StrudelAudioManager {
     if (!this.audioCtx) {
       try {
         this.audioCtx = new AudioContext();
-      } catch (e) {
+      } catch {
         return null;
       }
     }

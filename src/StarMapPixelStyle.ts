@@ -1,5 +1,5 @@
-import type { CanvasKit, Paint, Surface, Typeface } from 'canvaskit-wasm';
-import { MenuCallbacks, SkiaMenuStyle } from './SkiaMenu';
+import type { Paint } from 'canvaskit-wasm';
+import { SkiaMenuStyle } from './SkiaMenu';
 import {
   createCamera,
   resetCamera,
@@ -766,6 +766,7 @@ export class StarMapPixelStyle extends SkiaMenuStyle {
         case 'beacon':
           return Math.max(m, d + o.size * 2);
       }
+      return m;
     }, 0);
 
     this.unlockMinRadius = Math.max(1, this.systemBaseOrbit * 1.1);

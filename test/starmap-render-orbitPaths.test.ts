@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
-import { mixRgb } from '../src/game/skia/starmap/math/color';
-import type { PixelRenderer } from '../src/game/skia/starmap/render/PixelRenderer';
-import { drawOrbitPaths } from '../src/game/skia/starmap/render/passes/orbitPaths';
+import { mixRgb } from '../src/starmap/math/color';
+import type { PixelRenderer } from '../src/starmap/render/PixelRenderer';
+import { drawOrbitPaths } from '../src/starmap/render/passes/orbitPaths';
 
 describe('drawOrbitPaths', () => {
   it('draws planet-tinted orbit dots when enabled', () => {

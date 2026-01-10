@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import type { PixelRenderer } from '../src/game/skia/starmap/render/PixelRenderer';
-import { drawPixelText } from '../src/game/skia/starmap/ui/pixelTextDraw';
+import type { PixelRenderer } from '../src/starmap/render/PixelRenderer';
+import { drawPixelText } from '../src/starmap/ui/pixelTextDraw';
 
 describe('pixelTextDraw', () => {
   it('draws pixels via drawPixelAtSize', () => {

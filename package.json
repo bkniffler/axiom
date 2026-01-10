@@ -23,6 +23,7 @@
         "tsgo": "tsgo --noEmit"
     },
     "dependencies": {
+      "@types/bun": "^1.3.5",
         "@strudel/web": "^1.2.6",
         "@tauri-apps/api": "^2",
         "@tauri-apps/plugin-opener": "^2",

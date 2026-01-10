@@ -242,7 +242,9 @@ export abstract class MenuStyle {
     this.destroyed = true;
 
     // Cancel all animation frames
-    this.animationFrames.forEach((frame) => cancelAnimationFrame(frame));
+    this.animationFrames.forEach((frame) => {
+      cancelAnimationFrame(frame);
+    });
     this.animationFrames = [];
 
     if ((this as any)._keyHandler) {

@@ -1,4 +1,4 @@
-import { MenuCallbacks, SvgMenuStyle } from './SvgMenu';
+import { SvgMenuStyle } from './SvgMenu';
 
 interface RainDrop {
   x: number;

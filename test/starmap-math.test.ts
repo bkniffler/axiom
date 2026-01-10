@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'bun:test';
-import { mixRgb } from '../src/game/skia/starmap/math/color';
-import { smoothFactor } from '../src/game/skia/starmap/math/smoothing';
-import { buildBlackoutUniforms } from '../src/game/skia/starmap/shaders/BlackoutShader';
-import { buildNebulaUniforms } from '../src/game/skia/starmap/shaders/NebulaShader';
+import { mixRgb } from '../src/starmap/math/color';
+import { smoothFactor } from '../src/starmap/math/smoothing';
+import { buildBlackoutUniforms } from '../src/starmap/shaders/BlackoutShader';
+import { buildNebulaUniforms } from '../src/starmap/shaders/NebulaShader';
 
 describe('smoothFactor', () => {
   it('matches per-frame value at 60fps', () => {
