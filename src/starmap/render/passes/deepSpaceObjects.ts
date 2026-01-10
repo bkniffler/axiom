@@ -1,7 +1,7 @@
 import type { Rgb } from '../../math/color';
 import type { PixelRenderer } from '../PixelRenderer';
 
-export type DeepSpaceObject =
+type DeepSpaceObject =
   | {
       kind: 'nebula';
       x: number;
@@ -48,7 +48,7 @@ export type DeepSpaceObject =
       tail: number;
     };
 
-export interface DrawDeepSpaceParams {
+interface DrawDeepSpaceParams {
   renderer: PixelRenderer;
   objects: DeepSpaceObject[];
   elapsedSeconds: number;

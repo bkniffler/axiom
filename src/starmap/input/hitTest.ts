@@ -1,18 +1,18 @@
 import type { CameraTransformParams } from '../camera/transforms';
 import { worldToScreen } from '../camera/transforms';
 
-export interface HitTestPlanet {
+interface HitTestPlanet {
   worldX: number;
   worldY: number;
   size: number; // world-space size (same units as world coords)
 }
 
-export interface HitTestResult {
+interface HitTestResult {
   hoveredPlanetIndex: number;
   hoveredSun: boolean;
 }
 
-export interface HitTestParams {
+interface HitTestParams {
   mouseX: number;
   mouseY: number;
   zoom: number;

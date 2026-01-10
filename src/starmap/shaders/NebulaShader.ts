@@ -6,7 +6,7 @@ import type {
   Shader,
 } from 'canvaskit-wasm';
 
-export interface NebulaDrawParams {
+interface NebulaDrawParams {
   width: number;
   height: number;
   timeSeconds: number;

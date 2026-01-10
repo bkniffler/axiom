@@ -6,7 +6,7 @@ import type {
   Shader,
 } from 'canvaskit-wasm';
 
-export interface BlackoutDrawParams {
+interface BlackoutDrawParams {
   width: number;
   height: number;
   cameraX: number;

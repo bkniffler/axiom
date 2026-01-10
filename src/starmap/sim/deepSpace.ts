@@ -1,8 +1,8 @@
-export interface DeepSpaceObjectLike {
+interface DeepSpaceObjectLike {
   kind: string;
 }
 
-export interface CometLike extends DeepSpaceObjectLike {
+interface CometLike extends DeepSpaceObjectLike {
   kind: 'comet';
   x: number;
   y: number;

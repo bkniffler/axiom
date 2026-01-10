@@ -3,14 +3,14 @@ import { layoutPlanetInfoPanel } from '../../ui/infoPanelLayout';
 import { drawPixelText } from '../../ui/pixelTextDraw';
 import type { PixelRenderer } from '../PixelRenderer';
 
-export interface PlanetInfo {
+interface PlanetInfo {
   name: string;
   type: string;
   description: string;
   color: Rgb;
 }
 
-export interface DrawInfoPanelParams {
+interface DrawInfoPanelParams {
   renderer: PixelRenderer;
   viewportWidth: number;
   viewportHeight: number;

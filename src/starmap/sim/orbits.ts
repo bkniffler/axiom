@@ -1,4 +1,4 @@
-export interface PlanetOrbitLike {
+interface PlanetOrbitLike {
   orbitSpeed: number;
   angle: number;
   moon?: {
@@ -7,12 +7,12 @@ export interface PlanetOrbitLike {
   };
 }
 
-export interface OrbitingObjectLike {
+interface OrbitingObjectLike {
   orbitSpeed: number;
   angle: number;
 }
 
-export interface AsteroidBeltLike {
+interface AsteroidBeltLike {
   orbitSpeed: number;
   angle: number;
 }

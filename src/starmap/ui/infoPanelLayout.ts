@@ -1,6 +1,6 @@
 import { measurePixelTextWidth, wrapPixelText } from './pixelFont3x5';
 
-export interface PlanetInfoPanelLayout {
+interface PlanetInfoPanelLayout {
   panelX: number;
   panelY: number;
   panelWidth: number;
@@ -18,7 +18,7 @@ export interface PlanetInfoPanelLayout {
   paddingY: number;
 }
 
-export interface LayoutPlanetInfoPanelParams {
+interface LayoutPlanetInfoPanelParams {
   viewportWidth: number;
   viewportHeight: number;
   pixelSize: number;

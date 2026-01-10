@@ -2,16 +2,16 @@ import type { Rgb } from '../../math/color';
 import { mixRgb } from '../../math/color';
 import type { PixelRenderer } from '../PixelRenderer';
 
-export interface OrbitPathsPlanet {
+interface OrbitPathsPlanet {
   orbitRadius: number; // world units
   color: Rgb;
 }
 
-export interface OrbitPathsBelt {
+interface OrbitPathsBelt {
   orbitRadius: number; // world units
 }
 
-export interface DrawOrbitPathsParams {
+interface DrawOrbitPathsParams {
   renderer: PixelRenderer;
   show: boolean;
   sunScreenX: number;

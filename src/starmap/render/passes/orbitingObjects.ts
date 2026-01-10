@@ -1,9 +1,9 @@
 import type { Rgb } from '../../math/color';
 import type { PixelRenderer } from '../PixelRenderer';
 
-export type OrbitingObjectKind = 'station' | 'probe' | 'ship';
+type OrbitingObjectKind = 'station' | 'probe' | 'ship';
 
-export interface OrbitingObject {
+interface OrbitingObject {
   kind: OrbitingObjectKind;
   orbitRadius: number;
   angle: number;
@@ -12,7 +12,7 @@ export interface OrbitingObject {
   blinkSpeed?: number;
 }
 
-export interface DrawOrbitingObjectsParams {
+interface DrawOrbitingObjectsParams {
   renderer: PixelRenderer;
   objects: OrbitingObject[];
   elapsedSeconds: number;

@@ -1,6 +1,6 @@
 import type { Particle } from '../render/passes/particles';
 
-export interface StepParticlesParams {
+interface StepParticlesParams {
   particles: Particle[];
   deltaSeconds: number;
   transitionProgress: number;

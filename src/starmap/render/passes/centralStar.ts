@@ -1,7 +1,7 @@
 import type { Rgb } from '../../math/color';
 import type { PixelRenderer } from '../PixelRenderer';
 
-export interface DrawCentralStarParams {
+interface DrawCentralStarParams {
   renderer: PixelRenderer;
   sunX: number;
   sunY: number;

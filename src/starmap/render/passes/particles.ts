@@ -12,7 +12,7 @@ export interface Particle {
   size: number;
 }
 
-export interface DrawParticlesParams {
+interface DrawParticlesParams {
   renderer: PixelRenderer;
   particles: Particle[];
   rand?: () => number;

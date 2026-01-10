@@ -1,7 +1,7 @@
 import type { Rgb } from '../../math/color';
 import type { PixelRenderer } from '../PixelRenderer';
 
-export interface DrawScanlinesParams {
+interface DrawScanlinesParams {
   renderer: PixelRenderer;
   width: number;
   height: number;

@@ -1,7 +1,7 @@
 import type { Rgb } from '../math/color';
 import type { Particle } from '../render/passes/particles';
 
-export interface SpawnPlanet {
+interface SpawnPlanet {
   color: Rgb;
   size: number;
   screenX: number;
@@ -11,7 +11,7 @@ export interface SpawnPlanet {
   moonColor?: Rgb;
 }
 
-export interface SpawnParticlesParams {
+interface SpawnParticlesParams {
   planets: SpawnPlanet[];
   pixelSize: number;
   targetParticleCount: number;

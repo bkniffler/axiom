@@ -1,6 +1,6 @@
 import type { PixelRenderer } from '../PixelRenderer';
 
-export interface StarSprite {
+interface StarSprite {
   x: number;
   y: number;
   brightness: number;
@@ -8,7 +8,7 @@ export interface StarSprite {
   twinkleSpeed: number;
 }
 
-export interface DrawStarsParams {
+interface DrawStarsParams {
   renderer: PixelRenderer;
   stars: StarSprite[];
   elapsedSeconds: number;

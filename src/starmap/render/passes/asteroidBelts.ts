@@ -1,20 +1,20 @@
 import type { Rgb } from '../../math/color';
 import type { PixelRenderer } from '../PixelRenderer';
 
-export interface Asteroid {
+interface Asteroid {
   angleOffset: number;
   radiusOffset: number;
   size: number; // world size (in same units used by renderer calls via worldToScreen)
 }
 
-export interface AsteroidBelt {
+interface AsteroidBelt {
   orbitRadius: number;
   angle: number;
   color: Rgb;
   asteroids: Asteroid[];
 }
 
-export interface DrawAsteroidBeltsParams {
+interface DrawAsteroidBeltsParams {
   renderer: PixelRenderer;
   belts: AsteroidBelt[];
   transitionProgress: number;

@@ -138,7 +138,7 @@ export function drawPlanets(params: DrawPlanetsParams): void {
   }
 }
 
-export interface DrawHoverLabelParams {
+interface DrawHoverLabelParams {
   renderer: PixelRenderer;
   planet: PlanetSprite;
   zoom: number;

@@ -1,7 +1,7 @@
 import { MinHeap } from './MinHeap';
 import type { Vec2 } from './types';
 
-export interface PolarAStarPlanParams {
+interface PolarAStarPlanParams {
   start: Vec2;
   goal: Vec2;
   obstaclePoints: Vec2[];

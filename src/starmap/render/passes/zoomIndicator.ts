@@ -2,7 +2,7 @@ import type { Rgb } from '../../math/color';
 import { drawPixelText } from '../../ui/pixelTextDraw';
 import type { PixelRenderer } from '../PixelRenderer';
 
-export interface DrawZoomIndicatorParams {
+interface DrawZoomIndicatorParams {
   renderer: PixelRenderer;
   width: number;
   height: number;

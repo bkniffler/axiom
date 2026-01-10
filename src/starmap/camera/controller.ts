@@ -1,6 +1,6 @@
 import { smoothFactor } from '../math/smoothing';
 
-export interface CameraState {
+interface CameraState {
   x: number;
   y: number;
   targetX: number;
