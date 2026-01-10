@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
-import { stepParticles } from '../src/starmap/sim/particles';
-import { spawnPlanetExplosionParticles } from '../src/starmap/sim/particlesSpawn';
+import { stepParticles } from '@/starmap/sim/particles';
+import { spawnPlanetExplosionParticles } from '@/starmap/sim/particlesSpawn';
 
 describe('particles', () => {
   it('spawns particles deterministically with injected rng', () => {

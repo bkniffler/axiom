@@ -3,13 +3,13 @@ import { mixRgb } from '../../math/color';
 import { drawPixelText } from '../../ui/pixelTextDraw';
 import type { PixelRenderer } from '../PixelRenderer';
 
-export interface PlanetMoon {
+interface PlanetMoon {
   orbitRadius: number;
   angle: number;
   size: number;
 }
 
-export interface PlanetSprite {
+interface PlanetSprite {
   name: string;
   type: string;
   description: string;
@@ -21,12 +21,12 @@ export interface PlanetSprite {
   moon?: PlanetMoon;
 }
 
-export interface ShakeOffset {
+interface ShakeOffset {
   seed: number;
   delay: number;
 }
 
-export interface DrawPlanetsParams {
+interface DrawPlanetsParams {
   renderer: PixelRenderer;
   planets: PlanetSprite[];
   shakeOffsets: ShakeOffset[];
@@ -40,7 +40,7 @@ export interface DrawPlanetsParams {
   worldToScreen: (wx: number, wy: number) => { x: number; y: number };
 }
 
-export function getPlanetWorldPosition(planet: {
+function getPlanetWorldPosition(planet: {
   orbitRadius: number;
   angle: number;
 }): { x: number; y: number } {

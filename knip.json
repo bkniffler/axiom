@@ -2,12 +2,13 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": [
     "index.html!",
-    "vite.config.ts!",
     "src/main.ts!",
-    "test/*.test.ts"
+    "test/**/*.test.ts"
   ],
   "project": [
-    "tsconfig.json"
+    "src/**/*.{ts,tsx}",
+    "test/**/*.{ts,tsx}",
+    "vite.config.ts"
   ],
   "bun": true,
   "vite": true,
@@ -16,21 +17,12 @@
   "ignore": [
     "**/dist/**",
     "**/build/**",
-    "src-tauri/**",
-    ".claude/**",
-    "**/*.stories.*",
-    "src/scenes/**",
-    "src/shaders/**",
-    "src/styles/**",
-    "src/svg/**"
+    "src-tauri/target/**",
+    "src-tauri/gen/**",
+    ".claude/**"
   ],
   "ignoreDependencies": [
-    "@types/bun",
-    "bun-types",
-    "@tauri-apps/api",
-    "@tauri-apps/plugin-opener",
-    "phaser",
-    "pixi.js"
+    "bun-types"
   ],
   "ignoreBinaries": []
 }

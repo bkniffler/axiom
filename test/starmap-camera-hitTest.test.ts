@@ -3,9 +3,9 @@ import {
   createCamera,
   setCameraTarget,
   stepCamera,
-} from '../src/starmap/camera/controller';
-import { screenToWorld, worldToScreen } from '../src/starmap/camera/transforms';
-import { hitTestStarMap } from '../src/starmap/input/hitTest';
+} from '@/starmap/camera/controller';
+import { screenToWorld, worldToScreen } from '@/starmap/camera/transforms';
+import { hitTestStarMap } from '@/starmap/input/hitTest';
 
 describe('camera transforms', () => {
   it('worldToScreen and screenToWorld are inverses (parallax=1)', () => {
