@@ -1,5 +1,5 @@
-import type { Rgb } from '../math/color';
-import type { PixelRenderer } from '../render/PixelRenderer';
+import type { Rgb } from '@/math/color';
+import type { PixelRenderer } from '@/render/PixelRenderer';
 import { FONT_3X5 } from './pixelFont3x5';
 
 function drawPixelChar(

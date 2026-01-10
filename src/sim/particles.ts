@@ -1,4 +1,4 @@
-import type { Particle } from '../render/passes/particles';
+import type { Particle } from '@/render/passes/particles';
 
 interface StepParticlesParams {
   particles: Particle[];

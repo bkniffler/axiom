@@ -1,5 +1,5 @@
 import type { Canvas, CanvasKit, Paint } from 'canvaskit-wasm';
-import type { Rgb } from '../math/color';
+import type { Rgb } from '@/math/color';
 import type { PixelRenderer } from './PixelRenderer';
 
 export class SkiaPixelRenderer implements PixelRenderer {

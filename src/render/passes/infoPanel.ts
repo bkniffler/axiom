@@ -1,6 +1,6 @@
-import type { Rgb } from '../../math/color';
-import { layoutPlanetInfoPanel } from '../../ui/infoPanelLayout';
-import { drawPixelText } from '../../ui/pixelTextDraw';
+import type { Rgb } from '@/math/color';
+import { layoutPlanetInfoPanel } from '@/ui/infoPanelLayout';
+import { drawPixelText } from '@/ui/pixelTextDraw';
 import type { PixelRenderer } from '../PixelRenderer';
 
 interface PlanetInfo {

@@ -1,4 +1,4 @@
-import type { Rgb } from '../math/color';
+import type { Rgb } from '@/math/color';
 
 export interface PixelRenderer {
   drawPixel(x: number, y: number, color: Rgb, opacity?: number): void;

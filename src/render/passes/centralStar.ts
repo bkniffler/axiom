@@ -1,4 +1,4 @@
-import type { Rgb } from '../../math/color';
+import type { Rgb } from '@/math/color';
 import type { PixelRenderer } from '../PixelRenderer';
 
 interface DrawCentralStarParams {

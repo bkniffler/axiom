@@ -1,4 +1,4 @@
-import { smoothFactor } from '../math/smoothing';
+import { smoothFactor } from '@/math/smoothing';
 
 interface CameraState {
   x: number;

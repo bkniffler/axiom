@@ -1,5 +1,5 @@
-import type { Rgb } from '../../math/color';
-import { drawPixelText } from '../../ui/pixelTextDraw';
+import type { Rgb } from '@/math/color';
+import { drawPixelText } from '@/ui/pixelTextDraw';
 import type { PixelRenderer } from '../PixelRenderer';
 
 interface DrawZoomIndicatorParams {

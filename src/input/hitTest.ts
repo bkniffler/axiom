@@ -1,5 +1,5 @@
-import type { CameraTransformParams } from '../camera/transforms';
-import { worldToScreen } from '../camera/transforms';
+import type { CameraTransformParams } from '@/camera/transforms';
+import { worldToScreen } from '@/camera/transforms';
 
 interface HitTestPlanet {
   worldX: number;

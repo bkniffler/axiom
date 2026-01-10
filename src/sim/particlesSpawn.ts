@@ -1,5 +1,5 @@
-import type { Rgb } from '../math/color';
-import type { Particle } from '../render/passes/particles';
+import type { Rgb } from '@/math/color';
+import type { Particle } from '@/render/passes/particles';
 
 interface SpawnPlanet {
   color: Rgb;
