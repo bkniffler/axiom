@@ -1,0 +1,30 @@
+{
+    "name": "template-tauri",
+    "private": true,
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "node log.js dev & tauri dev",
+        "dev-nolog": "tauri dev",
+        "vite-dev": "vite",
+        "build": "node log.js build & tauri build",
+        "build-nolog": "tauri build",
+        "vite-build": "tsc && vite build",
+        "test": "bun test",
+        "preview": "vite preview",
+        "tauri": "tauri"
+    },
+    "dependencies": {
+        "@strudel/web": "^1.2.6",
+        "@tauri-apps/api": "^2",
+        "@tauri-apps/plugin-opener": "^2",
+        "canvaskit-wasm": "^0.40.0",
+        "phaser": "^4.0.0-rc.6",
+        "pixi.js": "^8.15.0"
+    },
+    "devDependencies": {
+        "@tauri-apps/cli": "^2",
+        "typescript": "~5.6.2",
+        "vite": "^6.0.3"
+    }
+}
