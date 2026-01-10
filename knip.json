@@ -1,0 +1,99 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "includeEntryExports": false,
+  "ignoreExportsUsedInFile": false,
+  "astro": true,
+  "bun": true,
+  "expo": true,
+  "metro": true,
+  "postcss": true,
+  "storybook": true,
+  "tailwind": true,
+  "vite": true,
+  "vitest": true,
+  "ignore": [
+    ".claude/**",
+    "**/*.stories.*",
+    "packages/ui-components/src/styles/global.css",
+    "storybook/.chromatic/**",
+    "storybook/chromatic-*.xml",
+    "storybook/chromatic-diagnostics.json",
+    "storybook/chromatic.log",
+    "electron/dist/**",
+    "electron/dist-electron/**"
+  ],
+  "ignoreDependencies": [
+    "bun-types"
+  ],
+  "ignoreBinaries": [
+  ],
+  "workspaces": {
+    "storybook": {
+      "entry": [
+        ".storybook/**/*.{js,mjs,ts,tsx}",
+        "tailwind.config.mjs",
+        "vitest.config.ts"
+      ]
+    },
+    "electron": {
+      "entry": [
+        "electron.vite.config.ts",
+        "electron/main.ts",
+        "src/main.tsx",
+        "src/preload/index.ts",
+        "index.html",
+        "tailwind.config.js",
+        "postcss.config.js"
+      ]
+    },
+    "expo": {
+      "entry": [
+        "index.ts",
+        "App.tsx",
+        "app/**/*.{js,jsx,ts,tsx}",
+        "src/**/*.{js,jsx,ts,tsx}",
+        "metro.config.js",
+        "babel.config.js",
+        "tailwind.config.js"
+      ]
+    },
+    "packages/app-shell": {
+      "entry": ["src/index.ts"]
+    },
+    "packages/data-pipeline": {
+      "entry": ["src/index.ts"]
+    },
+    "packages/medical-ui": {
+      "entry": ["src/index.ts"]
+    },
+    "packages/powersync": {
+      "entry": ["src/index.ts"]
+    },
+    "packages/ui-components": {
+      "entry": ["src/index.ts"]
+    },
+    "packages/views": {
+      "entry": ["src/index.ts"]
+    },
+    "config/component": {
+      "entry": ["tsconfig.json"]
+    },
+    "config/tailwind": {
+      "entry": ["preset.js"]
+    },
+    "config/vite": {
+      "entry": ["extensions.js"]
+    },
+    "config/tsconfig": {
+      "entry": [
+        "tsconfig.base.json",
+        "tsconfig.react.json",
+        "tsconfig.react-native.json",
+        "tsconfig.node.json",
+        "tsconfig.bun.json",
+        "tsconfig.expo.json",
+        "tsconfig.astro.json"
+      ]
+    }
+  }
+}

@@ -1,5 +1,5 @@
-import StartGame from './game/main';
+import StartGame from './Game';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await StartGame('game-container');
+  await StartGame('game-container');
 });
