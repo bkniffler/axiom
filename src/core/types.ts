@@ -45,6 +45,8 @@ export type PlanetState = {
   development: number;
   relicClaimed: boolean;
   known: PlanetKnowledge;
+  // Iteration 3: Permanent income modifier (from aggressive choices like Purge)
+  incomeModifier: number;
 };
 
 export type Route = {
@@ -80,6 +82,9 @@ export type EventOption = {
     addBrewingEvent?: Omit<BrewingEvent, 'id' | 'revealed'> & {
       revealed?: boolean;
     };
+    // Iteration 3: Aggressive options
+    incomeModifier?: number; // Permanent income change on planet (e.g., -1 for Purge)
+    destroyPlanet?: boolean; // Destroy the planet entirely (Orbital Strike)
   };
 };
 
@@ -95,6 +100,42 @@ export type ActiveEvent = {
 
 type TechId = string;
 type RelicId = string;
+
+export type Networks = {
+  trade: boolean;
+  industrial: boolean;
+  scientific: boolean;
+  military: boolean;
+  agricultural: boolean;
+};
+
+export type EconomyBreakdown = {
+  baseIncome: number;
+  multiplier: number;
+  grossIncome: number;
+  planetUpkeep: number;
+  entropyDrain: number;
+  concordatTribute: number;
+  eventLosses: number;
+  netIncome: number;
+};
+
+// Iteration 3: Concordat presence system
+export type ConcordatStance = 'unaware' | 'watching' | 'curious' | 'hostile';
+
+export type ConcordatPresence = {
+  stance: ConcordatStance;
+  stage: 'none' | 'awareness' | 'observers' | 'emissary' | 'fleet' | 'intervention';
+};
+
+// Iteration 3: Victory conditions
+export type VictoryType = 'influence' | 'domination' | 'concordat' | 'exploration';
+
+export type VictoryCondition =
+  | { type: 'influence'; threshold: number } // Accumulate X influence
+  | { type: 'domination'; percentage: number } // Control X% of planets
+  | { type: 'concordat'; outcome: 'alliance' | 'defeat' } // Concordat alliance or defeat
+  | { type: 'exploration' }; // Scout all planets (original)
 
 export type ShopCard = {
   id: string;
@@ -136,6 +177,21 @@ export type GameConfig = {
     developmentBonus: number;
     partnerShare: number;
   };
+
+  // Iteration 2: Upkeep system
+  upkeepByRing: number[]; // [0, 1, 2, 3, 4] - upkeep per planet by ring
+  entropyDrain: Record<number, number>; // { 25: 3, 50: 8, 75: 15 } - drain at threshold
+  concordatTribute: {
+    observers: number;
+    emissary: number;
+    ultimatum: number;
+  };
+
+  // Iteration 3: Victory conditions
+  victory: {
+    influenceThreshold: number; // Accumulate this much influence to win
+    dominationPercentage: number; // Control this % of planets to win
+  };
 };
 
 export type GameState = {
@@ -163,6 +219,21 @@ export type GameState = {
 
   tech: Record<TechId, true>;
   relics: Record<RelicId, number>;
+
+  // Iteration 2: Economy system
+  networks: Networks;
+  economy: EconomyBreakdown;
+  negativeIncomeTurns: number;
+  echoOfMyrakathActive: boolean; // Temporary multiplier boost
+
+  // Iteration 3: Concordat presence system
+  concordat: ConcordatPresence;
+
+  // Iteration 3.2: Positive feedback tracking
+  previousNetworks: Networks;          // Track network state for activation detection
+  highestMultiplier: number;           // Track highest multiplier achieved
+  multiplierMilestones: number[];      // Track which milestones claimed (2.0, 2.5, 3.0, 4.0)
+  colonizationsThisTurn: number;       // Track colonizations for streak bonus
 };
 
 export type PlayerAction =

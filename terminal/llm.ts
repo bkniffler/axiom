@@ -235,9 +235,43 @@ const parseCommand = (
 
 const formatStateSummary = (state: GameState): string[] => {
   const lines: string[] = [];
+  const entropyPct = Math.round((state.entropy / state.config.entropyMax) * 100);
   lines.push(
-    `Phase=${state.phase} Turn=${state.turn} Influence=${state.influence} Entropy=${state.entropy} Ring=${state.galaxy.revealedRing + 1}/${state.galaxy.ringCount}`
+    `Phase=${state.phase} Turn=${state.turn} Influence=${state.influence} Entropy=${state.entropy}/${state.config.entropyMax} (${entropyPct}%) Ring=${state.galaxy.revealedRing + 1}/${state.galaxy.ringCount}`
   );
+
+  // Economy breakdown
+  const eco = state.economy;
+  const upkeepTotal = eco.planetUpkeep + eco.entropyDrain + eco.concordatTribute + eco.eventLosses;
+  const netColor = eco.netIncome >= 0 ? '' : '(DEFICIT!)';
+  lines.push(
+    `Economy: ${eco.baseIncome} base × ${eco.multiplier.toFixed(1)}x = ${eco.grossIncome} gross | Upkeep: -${upkeepTotal} (planets:${eco.planetUpkeep} entropy:${eco.entropyDrain} tribute:${eco.concordatTribute} events:${eco.eventLosses}) | Net: ${eco.netIncome >= 0 ? '+' : ''}${eco.netIncome} ${netColor}`
+  );
+
+  // Active networks
+  const activeNetworks = Object.entries(state.networks)
+    .filter(([_, active]) => active)
+    .map(([name]) => name.charAt(0).toUpperCase() + name.slice(1));
+  if (activeNetworks.length > 0) {
+    lines.push(`Networks: [${activeNetworks.join('] [')}]`);
+  }
+
+  // Iteration 3: Concordat presence (now entropy-responsive only)
+  const conc = state.concordat;
+  if (conc.stage !== 'none') {
+    const stanceLabel = conc.stance === 'hostile' ? ' (HOSTILE)' : conc.stance === 'curious' ? ' (curious)' : '';
+    lines.push(`Concordat: ${conc.stage}${stanceLabel}`);
+  }
+
+  // Iteration 3: Victory progress
+  const totalPlanets = Object.keys(state.planets).length;
+  const controlledPlanets = Object.values(state.planets).filter(
+    (p) => p.status === 'controlled' || p.status === 'partnered'
+  ).length;
+  const controlPct = Math.round((controlledPlanets / totalPlanets) * 100);
+  const influencePct = Math.round((state.influence / state.config.victory.influenceThreshold) * 100);
+  const domPct = Math.round(state.config.victory.dominationPercentage * 100);
+  lines.push(`Victory progress: Influence ${state.influence}/${state.config.victory.influenceThreshold} (${influencePct}%) | Domination ${controlledPlanets}/${totalPlanets} (${controlPct}%/${domPct}%)`);
 
   const sel = state.selectedPlanetId;
   if (sel) {

@@ -8,13 +8,19 @@ import {
   tickBrewingEvents,
 } from './events';
 import { generateGalaxy, neighborsOf } from './galaxy';
+import {
+  calculateEconomy,
+  detectNetworks,
+} from './networks';
 import { rollShop } from './shop';
 import type {
   ActiveEvent,
+  EconomyBreakdown,
   GameConfig,
   GameEffect,
   GameEvent,
   GameState,
+  Networks,
   PlanetId,
   PlanetState,
   PlayerAction,
@@ -116,6 +122,25 @@ const costs = (state: GameState) => {
   };
 };
 
+const defaultNetworks: Networks = {
+  trade: false,
+  industrial: false,
+  scientific: false,
+  military: false,
+  agricultural: false,
+};
+
+const defaultEconomy: EconomyBreakdown = {
+  baseIncome: 0,
+  multiplier: 1.0,
+  grossIncome: 0,
+  planetUpkeep: 0,
+  entropyDrain: 0,
+  concordatTribute: 0,
+  eventLosses: 0,
+  netIncome: 0,
+};
+
 export const createNewGame = (
   seed = 1,
   config?: Partial<GameConfig>
@@ -140,10 +165,34 @@ export const createNewGame = (
     shop: { offers: [], rerollsThisTurn: 0 },
     tech: {},
     relics: {},
+
+    // Iteration 2: Economy system
+    networks: defaultNetworks,
+    economy: defaultEconomy,
+    negativeIncomeTurns: 0,
+    echoOfMyrakathActive: false,
+
+    // Iteration 3: Concordat presence
+    concordat: {
+      stance: 'unaware',
+      stage: 'none',
+    },
+
+    // Iteration 3.2: Positive feedback tracking
+    previousNetworks: { ...defaultNetworks },
+    highestMultiplier: 1.0,
+    multiplierMilestones: [],
+    colonizationsThisTurn: 0,
   };
 
+  // Calculate initial economy
+  const networks = detectNetworks(initial);
+  const withNetworks = { ...initial, networks };
+  const economy = calculateEconomy(withNetworks);
+
   return {
-    ...initial,
+    ...withNetworks,
+    economy,
     shop: { offers: rollShop(initial, 0), rerollsThisTurn: 0 },
   };
 };
@@ -170,6 +219,42 @@ const checkGameOver = (state: GameState): TransitionResult | null => {
     };
   }
 
+  // Iteration 3: Multiple victory conditions
+
+  // 1. Influence Victory: Accumulate threshold influence
+  if (state.influence >= state.config.victory.influenceThreshold) {
+    return {
+      state: { ...state, phase: 'won' },
+      effects: [
+        {
+          type: 'GAME_OVER',
+          outcome: 'won',
+          reason: `Influence Victory! Accumulated ${state.influence} influence.`,
+        },
+      ],
+    };
+  }
+
+  // 2. Domination Victory: Control threshold % of planets
+  const totalPlanets = Object.keys(state.planets).length;
+  const controlledPlanets = Object.values(state.planets).filter(
+    (p) => p.status === 'controlled' || p.status === 'partnered'
+  ).length;
+  const controlPercentage = controlledPlanets / totalPlanets;
+  if (controlPercentage >= state.config.victory.dominationPercentage) {
+    return {
+      state: { ...state, phase: 'won' },
+      effects: [
+        {
+          type: 'GAME_OVER',
+          outcome: 'won',
+          reason: `Domination Victory! Control ${Math.round(controlPercentage * 100)}% of the galaxy.`,
+        },
+      ],
+    };
+  }
+
+  // 3. Exploration Victory (original): Scout all revealed planets
   const allScouted = Object.values(state.planets).every(
     (p) => p.known.scouted || p.intrinsic.ring > state.galaxy.revealedRing
   );
@@ -180,13 +265,69 @@ const checkGameOver = (state: GameState): TransitionResult | null => {
         {
           type: 'GAME_OVER',
           outcome: 'won',
-          reason: 'All revealed worlds scouted',
+          reason: 'Exploration Victory! All revealed worlds scouted.',
         },
       ],
     };
   }
 
+  // Note: Concordat Victory (alliance/defeat) is handled via event responses
+
   return null;
+};
+
+// Iteration 3.2: Update Concordat presence based on entropy levels only
+const updateConcordatPresence = (
+  state: GameState,
+  effects: GameEffect[]
+): GameState => {
+  const entropyPercent = (state.entropy / state.config.entropyMax) * 100;
+  let concordat = { ...state.concordat };
+  const prevStage = concordat.stage;
+
+  // Update stage based on entropy thresholds (entropy-responsive only)
+  if (entropyPercent >= 75 && concordat.stage !== 'fleet' && concordat.stage !== 'intervention') {
+    concordat.stage = 'fleet';
+    concordat.stance = 'hostile';
+    effects.push({
+      type: 'MESSAGE',
+      message: 'Concordat fleet approaches! (Tribute: -20/turn, 5 turns to submit or fight)',
+    });
+  } else if (entropyPercent >= 50 && (concordat.stage === 'none' || concordat.stage === 'awareness' || concordat.stage === 'observers')) {
+    concordat.stage = 'emissary';
+    concordat.stance = 'hostile';
+    effects.push({
+      type: 'MESSAGE',
+      message: 'Concordat Emissary arrives with demands (Tribute: -12/turn)',
+    });
+  } else if (entropyPercent >= 25 && (concordat.stage === 'none' || concordat.stage === 'awareness')) {
+    concordat.stage = 'observers';
+    concordat.stance = 'watching';
+    effects.push({
+      type: 'MESSAGE',
+      message: 'Concordat Observers arrive (Tribute: -5/turn)',
+    });
+  } else if (entropyPercent >= 10 && concordat.stage === 'none') {
+    concordat.stage = 'awareness';
+    concordat.stance = 'watching';
+    effects.push({
+      type: 'MESSAGE',
+      message: 'The Concordat has noticed your expansion... (Tribute: -2/turn)',
+    });
+  }
+
+  // Update stance based on entropy (affects behavior) - only if stage didn't just change
+  if (prevStage === concordat.stage && concordat.stage !== 'none') {
+    if (entropyPercent < 30) {
+      concordat.stance = 'curious'; // Low entropy: ally potential
+    } else if (entropyPercent >= 60) {
+      concordat.stance = 'hostile'; // High entropy: seen as threat
+    } else {
+      concordat.stance = 'watching'; // Neutral
+    }
+  }
+
+  return { ...state, concordat };
 };
 
 // Force-spawn Concordat Intervention when entropy hits threshold
@@ -598,16 +739,13 @@ const useRelic = (
     }
 
     case 'relic-echo-of-myrakath': {
-      const income = Object.values(state.planets).reduce(
-        (acc, p) => acc + planetIncome(state, p),
-        0
-      );
+      // Set the multiplier boost flag - will be applied at end of turn
       let next = consumeRelic(state);
-      next = { ...next, influence: next.influence + income };
+      next = { ...next, echoOfMyrakathActive: true };
       next = applyEntropy(next, +6);
       effects.push({
         type: 'MESSAGE',
-        message: `Relic used: Echo of Myr'akath (+${income} bonus Influence, +6 Entropy)`,
+        message: `Relic used: Echo of Myr'akath (+2.0x multiplier this turn, +6 Entropy)`,
       });
       return { state: next, effects };
     }
@@ -616,16 +754,128 @@ const useRelic = (
       const filteredBrewing = state.events.brewing.filter(
         (e) => e.kind !== 'concordat'
       );
+      const filteredActive = state.events.active.filter(
+        (e) => e.kind !== 'concordat'
+      );
       const next = applyEntropy(
         {
           ...consumeRelic(state),
-          events: { ...state.events, brewing: filteredBrewing },
+          events: { brewing: filteredBrewing, active: filteredActive },
         },
         +12
       );
       effects.push({
         type: 'MESSAGE',
         message: 'Relic used: Veil of Silence (Concordat events cleared, +12 Entropy)',
+      });
+      return { state: next, effects };
+    }
+
+    // Iteration 3: Aggressive relics
+    case 'relic-orbital-cannon': {
+      if (!targetPlanetId)
+        return invalid(state, 'Orbital Cannon requires a target planet');
+      const planet = state.planets[targetPlanetId];
+      if (!planet) return invalid(state, 'Unknown planet');
+
+      // Destroy the planet
+      const nextPlanet: PlanetState = {
+        ...planet,
+        status: 'unclaimed',
+        development: 0,
+        incomeModifier: -99, // Effectively destroyed
+      };
+
+      // Remove all events on this planet
+      const filteredBrewing = state.events.brewing.filter(
+        (e) => e.planetId !== targetPlanetId
+      );
+      const filteredActive = state.events.active.filter(
+        (e) => e.planetId !== targetPlanetId
+      );
+
+      const next = applyEntropy(
+        {
+          ...consumeRelic(state),
+          planets: { ...state.planets, [targetPlanetId]: nextPlanet },
+          events: { brewing: filteredBrewing, active: filteredActive },
+        },
+        +20
+      );
+      effects.push({
+        type: 'MESSAGE',
+        message: `Relic used: Orbital Cannon (${planet.intrinsic.name} destroyed, all events cleared, +20 Entropy)`,
+      });
+      return { state: next, effects };
+    }
+
+    case 'relic-propaganda-engine': {
+      // Resolve all Unrest events for free
+      const unrestEvents = state.events.active.filter((e) => e.type === 'unrest');
+      const entropyGain = unrestEvents.length; // +1 per event
+
+      const filteredActive = state.events.active.filter((e) => e.type !== 'unrest');
+
+      const next = applyEntropy(
+        {
+          ...consumeRelic(state),
+          events: { ...state.events, active: filteredActive },
+        },
+        entropyGain
+      );
+      effects.push({
+        type: 'MESSAGE',
+        message: `Relic used: Propaganda Engine (${unrestEvents.length} Unrest events resolved, +${entropyGain} Entropy)`,
+      });
+      return { state: next, effects };
+    }
+
+    case 'relic-doomsday-device': {
+      if (!targetPlanetId)
+        return invalid(state, 'Doomsday Device requires a target planet to identify ring');
+      const targetPlanet = state.planets[targetPlanetId];
+      if (!targetPlanet) return invalid(state, 'Unknown planet');
+
+      const targetRing = targetPlanet.intrinsic.ring;
+      if (targetRing === 0)
+        return invalid(state, 'Cannot destroy homeworld ring');
+
+      // Destroy all planets in the target ring
+      const updatedPlanets = { ...state.planets };
+      let destroyedCount = 0;
+      for (const [id, planet] of Object.entries(updatedPlanets)) {
+        if (planet.intrinsic.ring === targetRing) {
+          updatedPlanets[id] = {
+            ...planet,
+            status: 'unclaimed',
+            development: 0,
+            incomeModifier: -99,
+          };
+          destroyedCount++;
+        }
+      }
+
+      // Remove all events on planets in that ring
+      const filteredBrewing = state.events.brewing.filter((e) => {
+        const p = state.planets[e.planetId];
+        return p && p.intrinsic.ring !== targetRing;
+      });
+      const filteredActive = state.events.active.filter((e) => {
+        const p = state.planets[e.planetId];
+        return p && p.intrinsic.ring !== targetRing;
+      });
+
+      const next = applyEntropy(
+        {
+          ...consumeRelic(state),
+          planets: updatedPlanets,
+          events: { brewing: filteredBrewing, active: filteredActive },
+        },
+        +40
+      );
+      effects.push({
+        type: 'MESSAGE',
+        message: `Relic used: Doomsday Device (Ring ${targetRing} destroyed - ${destroyedCount} planets, +40 Entropy)`,
       });
       return { state: next, effects };
     }
@@ -644,14 +894,77 @@ const respondEvent = (
   if (!active) return invalid(state, 'Unknown active event');
   const option = optionById(active, optionId);
   if (!option) return invalid(state, 'Unknown event option');
-  if (state.influence < option.costInfluence)
-    return invalid(state, 'Not enough Influence');
 
-  let next = applyInfluence(state, -option.costInfluence);
+  // Iteration 3: Event cost scaling based on empire size
+  // Scale factor: 1 + (controlled_planets / 5)
+  const controlledCount = Object.values(state.planets).filter(
+    (p) => p.status === 'controlled' || p.status === 'partnered'
+  ).length;
+  const scaleFactor = 1 + controlledCount / 5;
+  const scaledCost = Math.floor(option.costInfluence * scaleFactor);
+
+  if (state.influence < scaledCost)
+    return invalid(state, `Not enough Influence (need ${scaledCost})`);
+
+  let next = applyInfluence(state, -scaledCost);
+  const effects: GameEffect[] = [];
+
   if (typeof option.effects.influence === 'number')
     next = applyInfluence(next, option.effects.influence);
   if (typeof option.effects.entropy === 'number')
     next = applyEntropy(next, option.effects.entropy);
+
+  // Iteration 3: Handle incomeModifier effect (permanent income change)
+  if (typeof option.effects.incomeModifier === 'number') {
+    const p = next.planets[active.planetId];
+    if (p) {
+      next = {
+        ...next,
+        planets: {
+          ...next.planets,
+          [active.planetId]: {
+            ...p,
+            incomeModifier: p.incomeModifier + option.effects.incomeModifier,
+          },
+        },
+      };
+    }
+  }
+
+  // Iteration 3: Handle destroyPlanet effect (orbital strike)
+  if (option.effects.destroyPlanet) {
+    const p = next.planets[active.planetId];
+    if (p) {
+      // Remove the planet from our control and mark as destroyed
+      next = {
+        ...next,
+        planets: {
+          ...next.planets,
+          [active.planetId]: {
+            ...p,
+            status: 'unclaimed',
+            development: 0,
+            incomeModifier: -99, // Effectively destroyed
+          },
+        },
+      };
+      // Remove any brewing events on this planet
+      next = {
+        ...next,
+        events: {
+          ...next.events,
+          brewing: next.events.brewing.filter(
+            (e) => e.planetId !== active.planetId
+          ),
+        },
+      };
+      effects.push({
+        type: 'MESSAGE',
+        message: `Planet ${p.intrinsic.name} destroyed by orbital strike!`,
+      });
+    }
+  }
+
   if (option.effects.planet) {
     const p = next.planets[active.planetId];
     if (p) {
@@ -694,15 +1007,12 @@ const respondEvent = (
     },
   };
 
-  return {
-    state: next,
-    effects: [
-      {
-        type: 'MESSAGE',
-        message: `Resolved event: ${active.title} → ${option.label}`,
-      },
-    ],
-  };
+  effects.push({
+    type: 'MESSAGE',
+    message: `Resolved event: ${active.title} → ${option.label}${scaledCost !== option.costInfluence ? ` (cost scaled to ${scaledCost})` : ''}`,
+  });
+
+  return { state: next, effects };
 };
 
 const endTurn = (state: GameState): TransitionResult => {
@@ -711,13 +1021,37 @@ const endTurn = (state: GameState): TransitionResult => {
   const effects: GameEffect[] = [];
   let next: GameState = state;
 
-  const income = collectInfluence(next);
-  next = income.state;
-  if (income.income > 0)
-    effects.push({
-      type: 'MESSAGE',
-      message: `Income: +${income.income} Influence`,
-    });
+  // Recalculate networks and economy (before resetting echo so it applies this turn)
+  const networks = detectNetworks(next);
+  next = { ...next, networks };
+  const economy = calculateEconomy(next);
+  next = { ...next, economy };
+
+  // Apply net income (can go negative!)
+  const netIncome = economy.netIncome;
+  next = { ...next, influence: Math.max(0, next.influence + netIncome) };
+
+  // Reset Echo of Myr'akath after income is applied
+  next = { ...next, echoOfMyrakathActive: false };
+
+  // Build income message with breakdown
+  const incomeMsg = netIncome >= 0
+    ? `Income: ${economy.baseIncome} × ${economy.multiplier.toFixed(1)}x = ${economy.grossIncome} - ${economy.planetUpkeep + economy.entropyDrain + economy.concordatTribute + economy.eventLosses} upkeep = +${netIncome}`
+    : `Income: ${economy.baseIncome} × ${economy.multiplier.toFixed(1)}x = ${economy.grossIncome} - ${economy.planetUpkeep + economy.entropyDrain + economy.concordatTribute + economy.eventLosses} upkeep = ${netIncome} (DEFICIT!)`;
+  effects.push({ type: 'MESSAGE', message: incomeMsg });
+
+  // Track negative income turns
+  if (netIncome < 0) {
+    next = { ...next, negativeIncomeTurns: next.negativeIncomeTurns + 1 };
+    if (next.negativeIncomeTurns >= 3) {
+      effects.push({
+        type: 'MESSAGE',
+        message: 'WARNING: 3 turns of deficit! Empire collapsing...',
+      });
+    }
+  } else {
+    next = { ...next, negativeIncomeTurns: 0 };
+  }
 
   // Passive entropy from large empires (expansion draws attention)
   const controlled = Object.values(next.planets).filter(
@@ -733,6 +1067,9 @@ const endTurn = (state: GameState): TransitionResult => {
       });
     }
   }
+
+  // Iteration 3: Update Concordat presence
+  next = updateConcordatPresence(next, effects);
 
   const revealed = maybeRevealNextRing(next);
   next = revealed.state;
