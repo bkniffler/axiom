@@ -256,6 +256,14 @@ const formatStateSummary = (state: GameState): string[] => {
     lines.push(`Networks: [${activeNetworks.join('] [')}]`);
   }
 
+  // Iteration 3.2: Positive feedback tracking
+  if (state.multiplierMilestones.length > 0) {
+    lines.push(`Multiplier milestones achieved: ${state.multiplierMilestones.join('x, ')}x`);
+  }
+  if (state.highestMultiplier > 1.0) {
+    lines.push(`Highest multiplier: ${state.highestMultiplier.toFixed(1)}x`);
+  }
+
   // Iteration 3: Concordat presence (now entropy-responsive only)
   const conc = state.concordat;
   if (conc.stage !== 'none') {
