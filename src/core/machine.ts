@@ -139,6 +139,14 @@ const NETWORK_ACTIVATION_BONUSES: Record<string, number> = {
   agricultural: 6,  // Connect 3 Agricultural → +6 influence
 };
 
+// Iteration 3.2: One-time bonuses when hitting multiplier thresholds
+const MULTIPLIER_MILESTONES: Array<{ threshold: number; bonus: number }> = [
+  { threshold: 2.0, bonus: 10 },   // Hit 2.0x multiplier → +10 influence
+  { threshold: 2.5, bonus: 15 },   // Hit 2.5x → +15 influence
+  { threshold: 3.0, bonus: 25 },   // Hit 3.0x → +25 influence
+  { threshold: 4.0, bonus: 40 },   // Hit 4.0x → +40 influence (rare achievement)
+];
+
 const defaultEconomy: EconomyBreakdown = {
   baseIncome: 0,
   multiplier: 1.0,
@@ -1052,6 +1060,28 @@ const endTurn = (state: GameState): TransitionResult => {
   }
   // Update previousNetworks to track which networks have been activated
   next = { ...next, previousNetworks: { ...next.networks } };
+
+  // Iteration 3.2: Check for multiplier milestone achievements
+  const currentMultiplier = economy.multiplier;
+  for (const milestone of MULTIPLIER_MILESTONES) {
+    const alreadyClaimed = next.multiplierMilestones.includes(milestone.threshold);
+    if (!alreadyClaimed && currentMultiplier >= milestone.threshold) {
+      next = {
+        ...next,
+        influence: next.influence + milestone.bonus,
+        multiplierMilestones: [...next.multiplierMilestones, milestone.threshold],
+        highestMultiplier: Math.max(next.highestMultiplier, currentMultiplier),
+      };
+      effects.push({
+        type: 'MESSAGE',
+        message: `Multiplier milestone ${milestone.threshold}x reached! +${milestone.bonus} influence`,
+      });
+    }
+  }
+  // Always track highest multiplier
+  if (currentMultiplier > next.highestMultiplier) {
+    next = { ...next, highestMultiplier: currentMultiplier };
+  }
 
   // Apply net income (can go negative!)
   const netIncome = economy.netIncome;
