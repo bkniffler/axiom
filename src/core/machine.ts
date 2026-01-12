@@ -1031,6 +1031,23 @@ const endTurn = (state: GameState): TransitionResult => {
   const netIncome = economy.netIncome;
   next = { ...next, influence: Math.max(0, next.influence + netIncome) };
 
+  // Deficit → Entropy: Economic chaos breeds cosmic chaos
+  if (economy.netIncome < 0) {
+    const deficitSeverity = Math.abs(economy.netIncome);
+    let entropyGain: number;
+
+    if (deficitSeverity <= 5) entropyGain = 1;
+    else if (deficitSeverity <= 10) entropyGain = 2;
+    else if (deficitSeverity <= 20) entropyGain = 3;
+    else entropyGain = 4;
+
+    next = { ...next, entropy: Math.min(next.config.entropyMax, next.entropy + entropyGain) };
+    effects.push({
+      type: 'MESSAGE',
+      message: `Economic chaos! Deficit of ${deficitSeverity} generates +${entropyGain} entropy`,
+    });
+  }
+
   // Reset Echo of Myr'akath after income is applied
   next = { ...next, echoOfMyrakathActive: false };
 
