@@ -147,6 +147,18 @@ const MULTIPLIER_MILESTONES: Array<{ threshold: number; bonus: number }> = [
   { threshold: 4.0, bonus: 40 },   // Hit 4.0x → +40 influence (rare achievement)
 ];
 
+// Iteration 3.2: One-time bonuses when planets reach max development (level 3)
+const DEVELOPMENT_LEVEL_3_BONUSES: Record<string, { bonus: number; description: string }> = {
+  Industrial: { bonus: 6, description: '+6 influence burst' },
+  Agricultural: { bonus: 4, description: '+4 influence burst' },
+  Scientific: { bonus: 10, description: '+10 influence burst' },
+  Military: { bonus: 5, description: '+5 influence, -2 entropy' },
+  Trade: { bonus: 8, description: '+8 influence burst' },
+  Frontier: { bonus: 3, description: '+3 influence burst' },
+  Relic: { bonus: 15, description: '+15 influence burst' },
+  Barren: { bonus: 2, description: '+2 influence burst' },
+};
+
 const defaultEconomy: EconomyBreakdown = {
   baseIncome: 0,
   multiplier: 1.0,
@@ -551,20 +563,36 @@ const develop = (state: GameState, planetId: PlanetId): TransitionResult => {
     },
   };
 
-  const next = applyInfluence(
+  let next = applyInfluence(
     { ...state, planets: { ...state.planets, [planetId]: nextPlanet } },
     -c
   );
 
-  return {
-    state: next,
-    effects: [
-      {
+  const effects: GameEffect[] = [
+    {
+      type: 'MESSAGE',
+      message: `Developed ${p.intrinsic.name} to L${nextPlanet.development} (-${c} Influence)`,
+    },
+  ];
+
+  // Check if planet reached max development (level 3)
+  if (nextPlanet.development === 3 && p.development < 3) {
+    const planetType = p.intrinsic.type;
+    const combo = DEVELOPMENT_LEVEL_3_BONUSES[planetType];
+    if (combo) {
+      next = { ...next, influence: next.influence + combo.bonus };
+      effects.push({
         type: 'MESSAGE',
-        message: `Developed ${p.intrinsic.name} to L${nextPlanet.development} (-${c} Influence)`,
-      },
-    ],
-  };
+        message: `Max development on ${planetType} planet! ${combo.description}`,
+      });
+      // Special case: Military gives entropy reduction too
+      if (planetType === 'Military') {
+        next = { ...next, entropy: Math.max(0, next.entropy - 2) };
+      }
+    }
+  }
+
+  return { state: next, effects };
 };
 
 const investigate = (
