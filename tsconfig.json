@@ -3,7 +3,8 @@
         "target": "ES2020",
         "useDefineForClassFields": true,
         "module": "ESNext",
-        "types": ["@types/bun"],
+        "types": ["@types/bun", "@types/react"],
+        "jsx": "react-jsx",
         "lib": [
             "ES2020",
             "DOM",
@@ -28,6 +29,7 @@
     },
     "include": [
         "src",
+        "terminal",
         "test"
     ]
 }

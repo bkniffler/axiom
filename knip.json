@@ -3,7 +3,15 @@
   "entry": [
     "index.html!",
     "src/main.ts!",
+    "terminal/index.tsx!",
+    "terminal/llm.ts!",
     "test/**/*.test.ts"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}!",
+    "terminal/**/*.{ts,tsx}!",
+    "vite.config.ts!",
+    "test/**/*.{ts,tsx}"
   ],
   "bun": true,
   "vite": true,

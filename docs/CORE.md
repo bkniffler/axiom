@@ -1,79 +1,132 @@
-# Core (Headless) Prototype Plan
+# Core Roadmap (Headless, Deterministic)
 
-This file tracks the plan for the **headless, deterministic game core** and its milestones.
+This roadmap defines the **headless game core** for *Axiom Ascendant*.
 
-## Principles
-- **Pure state machine**: all simulation changes happen via `transition(state, event)`.
-- **Serializable state**: no DOM, no timers, no class instances; JSON-friendly.
-- **Headless first**: everything runs without rendering; UI is a thin adapter.
-- **Deterministic**: runs should be replayable from an initial snapshot + event log.
-- **Testable**: unit tests target the core reducer, not UI.
+It intentionally replaces all earlier prototype milestones (capacity/stability, etc). The source of truth is `docs/GameDesign.md`.
 
-## Current Layout
-- `src/core/`: milestone core reducer + types + helpers
-- `terminal/`: Ink-based CLI prototype (not wired to the game renderer)
-- `test/`: core and sim tests
+## Non-Negotiables
+- **Pure reducer**: all state changes happen via `transition(state, event) -> { state, effects }`
+- **Serializable state**: JSON-friendly; no DOM, timers, classes, or hidden singletons
+- **Deterministic**: given `seed + initialState + eventLog`, outcomes are replayable
+- **Thin UI**: terminal/renderer are adapters; core is platform-agnostic
+- **Test-first**: core rules are unit tested; content has targeted tests
 
-## Milestone 1 — Core Sim “State Machine”
-Goal: “a turn does something” with a minimal world and lose/win conditions, fully testable.
+## Current Core (Implemented)
 
-Scope:
-- World model: 2 systems, 4 planets, 1 route
-- Resources: `capacity`, `stability`, `knowledge`
-- Actions: build route, colonize, stabilize, research
-- Turn rules: 1 commit per turn; end-turn upkeep; stability collapse => loss
-- Win stub: survive `N` turns
-- Headless runner helper: apply/replay event sequences
-- CLI prototype: step the machine from the terminal
+### Galaxy & Planets
+- **Ring-based galaxy**: concentric rings revealed by expansion
+- **Planet types**: Industrial, Agricultural, Scientific, Military, Trade, Frontier, Relic, Barren
+- **Inhabitants**: Empty, Primitives, Natives, Ruins, Hostile
+- **Route connectivity**: guaranteed non-hostile paths to all planets (bug fixed)
 
-Delivered:
-- `src/core/machine.ts`
-- `src/core/runner.ts`
-- `terminal/index.tsx`
-- `test/core-machine.test.ts`
+### Economy
+- **Single currency**: Influence (everything costs it; planets produce it)
+- **Income**: per-turn from controlled/partnered planets
+- **Development**: increases planet influence output
 
-## Milestone 2 — Forecast Window (Clarity Engine)
-Goal: show “now + next 3 turns” for the *currently selected* action.
+### Actions
+- **Scout**: reveal planet properties (1 Influence)
+- **Colonize**: claim empty/primitive planets (5 Influence, +entropy by ring)
+- **Partner**: ally with natives (4 Influence, -2 with Diplomatic Corps)
+- **Develop**: boost planet output (4 Influence)
+- **Investigate**: reveal brewing events (2 Influence, -1 with Intel Network)
+- **Use Relic**: powerful one-time effects (+entropy)
 
-Scope:
-- Forecast function: `forecastAction(state, action) -> { immediate, nextTurns, uncertainty }`
-- Forecast UI in terminal: render a compact forecast preview before committing
-- Rule: forecast for 3 turns is deterministic; uncertainty is a simple risk band
+### Events System
+- **Hidden timers**: events brew invisibly, fire after countdown
+- **Event kinds**:
+  - **Internal**: Unrest -> Rebellion (escalation chain)
+  - **External**: Raiders -> Pirate Base, Refugees, Traders
+  - **Cosmic**: Anomaly (entropy-driven)
+  - **Concordat**: Observers -> Emissary -> Ultimatum -> Intervention
+- **Escalation**: ignoring events triggers worse follow-up events
 
-Delivered:
-- `src/core/machine.ts` (`forecastAction`, `pressure` + pressure band)
-- `terminal/index.tsx` (uppercase B/C/S/R previews)
+### Entropy
+- **Sources**:
+  - Colonization (scales by ring: 1 + ring number)
+  - Large empire (passive: 1 per 4 planets over 8)
+  - Aggressive event choices (Suppress, Harvest, etc.)
+  - Relic use (+3 to +12 depending on relic)
+- **Effects**:
+  - 25%+ entropy: increased cosmic events
+  - 50%+ entropy: Concordat observers appear (12% chance/turn)
+  - 75%+ entropy: Concordat emissaries (25% chance/turn)
+  - 100%: Concordat Intervention event (final choice)
+    - **Surrender**: entropy → 0, survive under Concordat rule
+    - **Fight**: +25 entropy, if entropy > 120 on turn end → defeat
 
-## Milestone 3 — Dilemma/Card System
-Goal: authored “decision cards” drive narrative consequences with the same reducer.
+### Shop & Tech
+- **3-slot shop**: refreshes each turn, reroll available
+- **Tech cards**:
+  - Warp Drive (T1): Colonize -1 Influence
+  - Intel Network (T1): Investigate -1 Influence, can find any event
+  - Terraforming Kits (T2): Develop gives +1 base influence on Barren
+  - Diplomatic Corps (T2): Partner -2 Influence
+- **Relics**:
+  - Axiom Key (T1): Reveal next ring (+10 Entropy)
+  - Precursor Archive (T1): Reveal all hidden events (+3 Entropy)
+  - Stasis Field (T2): Freeze event +10 turns (+5 Entropy)
+  - Echo of Myr'akath (T2): Bonus influence = income (+6 Entropy)
+  - Genesis Seed (T3): Terraform planet to Industrial (+8 Entropy)
+  - Veil of Silence (T3): Clear all Concordat events (+12 Entropy)
 
-Scope:
-- Card format (data-only): triggers + choices + deterministic effects
-- Minimal card deck (10-ish) with clear short-term consequences
-- Event integration: `DRAW_CARD`, `CHOOSE_OPTION`, `RESOLVE_CARD`
+### Victory/Loss
+- **Win**: Scout all revealed planets
+- **Lose**: Fight Concordat and fail (entropy > 120)
 
-Delivered (initial):
-- `src/core/dilemmas.ts` (authored dilemmas + triggers)
-- `src/core/machine.ts` (blocking decisions + `CHOOSE_DILEMMA_OPTION`)
-- `terminal/index.tsx` (dilemma UI with numeric choices)
+## Roadmap Status
 
-## Milestone 4 — Routes + Expansion Pressure
-Goal: make expansion feel like stress (logistics + stability interplay).
+### Milestone A - Planet Interaction Slice
+- [x] Scout, Colonize, Partner, Develop actions
+- [x] Planet type/inhabitants constrain actions
+- [x] Colonize without scout blocked
+- [x] All planets reachable via non-hostile paths
 
-Scope:
-- Route constraints (capacity/upkeep scaling)
-- Expansion introduces upkeep and/or event probability
-- Basic “map growth” beyond 2 systems (procedural or fixed)
+### Milestone B - Event Engine
+- [x] Brewing event pools by planet type
+- [x] Escalation chains (Unrest -> Rebellion)
+- [x] External events (Raiders -> Pirate Base, Refugees, Traders)
+- [x] Intel economy with Investigate action
+- [x] Intel Network tech enables global investigation
 
-Delivered (initial):
-- `src/core/machine.ts` (per-turn route upkeep, pressure drift bands, persistent `modifiers`)
-- `src/core/dilemmas.ts` (dilemma options can add timed/permanent modifiers)
-- `terminal/index.tsx` (shows active modifiers + per-option modifier adds)
-- `test/core-machine.test.ts` (modifier expiry regression)
+### Milestone C - Card Shop
+- [x] 3-slot shop with reroll
+- [x] Tech cards unlock modifiers
+- [x] Card tiers (T1, T2, T3)
 
-## Milestone 5 — Diplomacy (Thin Slice)
-Goal: one patron relationship meter + one “audit” enforcement event type.
+### Milestone D - Relics + Entropy
+- [x] 6 relics with unique effects
+- [x] Relic use adds entropy
+- [x] Entropy from colonization (scales by ring)
+- [x] Passive entropy from large empires
+- [x] Entropy affects event spawning rates
 
-Scope:
-- A single external meter (e.g. `attention` or `patronFavor`)
-- One audit event with branching consequences
+### Milestone E - Concordat
+- [x] Concordat event chain (Observers -> Emissary -> Ultimatum -> Intervention)
+- [x] High entropy triggers Concordat attention
+- [x] Submit vs Resist choices
+- [x] Veil of Silence relic counters Concordat
+
+### Milestone F - Endgame (Partial)
+- [x] Victory: full exploration (scout all planets)
+- [x] Loss: entropy threshold
+- [ ] Multiple victory paths (integration, independence)
+- [ ] Concordat final battle mechanics
+
+## Testing
+
+Test files in `test/`:
+- `core-machine.test.ts` - Core reducer tests
+- `core-galaxy.test.ts` - Galaxy generation, route connectivity
+- `core-entropy.test.ts` - Entropy generation
+- `core-events.test.ts` - Event materialization
+- `core-concordat.test.ts` - Concordat event chain
+- `core-relics.test.ts` - Relic effects
+
+Run tests: `bun test`
+
+## Implementation Notes
+- Keep authored content (cards/events) data-only in `content.ts`
+- Prefer small, composable effect helpers (`applyInfluence`/`applyEntropy`)
+- Test event materialization separately from spawning logic
+- Galaxy route repair ensures no dead-end planets

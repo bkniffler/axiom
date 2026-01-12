@@ -764,7 +764,10 @@ export class StarMapPixelStyle extends SkiaMenuStyle {
     }, 0);
 
     this.unlockMinRadius = Math.max(1, this.systemBaseOrbit * 1.1);
-    this.unlockMaxRadius = Math.max(this.unlockMinRadius + 1);
+    this.unlockMaxRadius = Math.max(
+      this.unlockMinRadius + 1,
+      Math.max(maxPlanet, maxBelt, maxOrbiting, maxDeep) * 1.05
+    );
 
     // Only set a default if the user/app hasn't already picked a radius.
     if (this.targetUnlockRadius <= 0) {

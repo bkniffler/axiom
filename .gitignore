@@ -23,3 +23,4 @@ dist-ssr
 
 .playwright-mcp
 .ignore/
+.llm-sessions/
