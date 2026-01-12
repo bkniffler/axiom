@@ -159,6 +159,13 @@ const DEVELOPMENT_LEVEL_3_BONUSES: Record<string, { bonus: number; description: 
   Barren: { bonus: 2, description: '+2 influence burst' },
 };
 
+// Iteration 3.2: Bonuses for colonizing multiple planets in one turn
+const COLONIZATION_STREAKS: Array<{ count: number; bonus: number }> = [
+  { count: 2, bonus: 3 },
+  { count: 3, bonus: 8 },
+  { count: 4, bonus: 15 },
+];
+
 const defaultEconomy: EconomyBreakdown = {
   baseIncome: 0,
   multiplier: 1.0,
@@ -491,6 +498,9 @@ const colonize = (state: GameState, planetId: PlanetId): TransitionResult => {
     -c
   );
   next = applyEntropy(next, entropyGain);
+
+  // Increment colonization counter for streak tracking
+  next = { ...next, colonizationsThisTurn: next.colonizationsThisTurn + 1 };
 
   return {
     state: next,
@@ -1182,6 +1192,27 @@ const endTurn = (state: GameState): TransitionResult => {
       });
     }
   }
+
+  // Check for colonization streak bonus
+  if (next.colonizationsThisTurn >= 2) {
+    // Find highest applicable streak
+    let streakBonus = 0;
+    for (const streak of COLONIZATION_STREAKS) {
+      if (next.colonizationsThisTurn >= streak.count) {
+        streakBonus = streak.bonus;
+      }
+    }
+    if (streakBonus > 0) {
+      next = { ...next, influence: next.influence + streakBonus };
+      effects.push({
+        type: 'MESSAGE',
+        message: `Colonization streak! ${next.colonizationsThisTurn} planets colonized this turn → +${streakBonus} influence`,
+      });
+    }
+  }
+
+  // Reset colonization counter for new turn
+  next = { ...next, colonizationsThisTurn: 0 };
 
   // Iteration 3: Update Concordat presence
   next = updateConcordatPresence(next, effects);
