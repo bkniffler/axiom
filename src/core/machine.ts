@@ -1047,6 +1047,20 @@ const endTurn = (state: GameState): TransitionResult => {
       message: `Economic chaos! Deficit of ${deficitSeverity} generates +${entropyGain} entropy`,
     });
   }
+  // Surplus stability: Strong income reduces entropy
+  else if (economy.netIncome >= 30 && next.entropy > 0) {
+    next = { ...next, entropy: Math.max(0, next.entropy - 2) };
+    effects.push({
+      type: 'MESSAGE',
+      message: 'Prosperity! Strong income (+30) reduces entropy by 2',
+    });
+  } else if (economy.netIncome >= 20 && next.entropy > 0) {
+    next = { ...next, entropy: Math.max(0, next.entropy - 1) };
+    effects.push({
+      type: 'MESSAGE',
+      message: 'Stability returns. Income (+20) reduces entropy by 1',
+    });
+  }
 
   // Reset Echo of Myr'akath after income is applied
   next = { ...next, echoOfMyrakathActive: false };
