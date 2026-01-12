@@ -130,6 +130,15 @@ const defaultNetworks: Networks = {
   agricultural: false,
 };
 
+// Iteration 3.2: One-time bonuses when networks first activate
+const NETWORK_ACTIVATION_BONUSES: Record<string, number> = {
+  trade: 15,        // Connect 3 Trade planets → +15 influence burst
+  industrial: 10,   // Connect 3 Industrial → +10 influence
+  scientific: 12,   // Connect 3 Scientific → +12 influence
+  military: 8,      // Connect 3 Military → +8 influence
+  agricultural: 6,  // Connect 3 Agricultural → +6 influence
+};
+
 const defaultEconomy: EconomyBreakdown = {
   baseIncome: 0,
   multiplier: 1.0,
@@ -1026,6 +1035,23 @@ const endTurn = (state: GameState): TransitionResult => {
   next = { ...next, networks };
   const economy = calculateEconomy(next);
   next = { ...next, economy };
+
+  // Iteration 3.2: Check for new network activations and award one-time bonuses
+  const networkTypes = ['trade', 'industrial', 'scientific', 'military', 'agricultural'] as const;
+  for (const networkType of networkTypes) {
+    const wasActive = next.previousNetworks[networkType];
+    const isActive = next.networks[networkType];
+    if (!wasActive && isActive) {
+      const bonus = NETWORK_ACTIVATION_BONUSES[networkType] ?? 0;
+      next = { ...next, influence: next.influence + bonus };
+      effects.push({
+        type: 'MESSAGE',
+        message: `${networkType.charAt(0).toUpperCase() + networkType.slice(1)} Network activated! +${bonus} influence`,
+      });
+    }
+  }
+  // Update previousNetworks to track which networks have been activated
+  next = { ...next, previousNetworks: { ...next.networks } };
 
   // Apply net income (can go negative!)
   const netIncome = economy.netIncome;
