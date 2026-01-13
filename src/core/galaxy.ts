@@ -120,6 +120,7 @@ export const generateGalaxy = (
         development: ring === 0 && i === 0 ? 1 : 0,
         relicClaimed: false,
         known: { scouted: ring === 0 && i === 0 },
+        incomeModifier: 0,
       };
     }
     rings.push(ringPlanets);

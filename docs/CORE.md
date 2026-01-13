@@ -19,10 +19,14 @@ It intentionally replaces all earlier prototype milestones (capacity/stability, 
 - **Inhabitants**: Empty, Primitives, Natives, Ruins, Hostile
 - **Route connectivity**: guaranteed non-hostile paths to all planets (bug fixed)
 
-### Economy
+### Economy (Iteration 2)
 - **Single currency**: Influence (everything costs it; planets produce it)
-- **Income**: per-turn from controlled/partnered planets
-- **Development**: increases planet influence output
+- **Multiplier system**: Final Income = Base Income × Multiplier
+- **Planet Networks**: 3+ connected same-type planets create synergy bonuses
+- **Upkeep costs**: Ring-based planet maintenance, entropy drain, Concordat tribute
+- **Net Income**: Gross income minus all upkeep costs
+
+See `docs/ITERATION-2.md` for full economy details.
 
 ### Actions
 - **Scout**: reveal planet properties (1 Influence)
@@ -115,13 +119,14 @@ It intentionally replaces all earlier prototype milestones (capacity/stability, 
 
 ## Testing
 
-Test files in `test/`:
-- `core-machine.test.ts` - Core reducer tests
-- `core-galaxy.test.ts` - Galaxy generation, route connectivity
-- `core-entropy.test.ts` - Entropy generation
-- `core-events.test.ts` - Event materialization
-- `core-concordat.test.ts` - Concordat event chain
-- `core-relics.test.ts` - Relic effects
+**Iteration 2:** Core tests removed for faster iteration. Testing via playtest:
+
+```bash
+bun terminal/llm.ts --session=test --reset --seed=42
+```
+
+Remaining test files in `test/`:
+- `starmap-pixel.test.ts` - StarMap rendering tests
 
 Run tests: `bun test`
 

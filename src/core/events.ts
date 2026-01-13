@@ -20,14 +20,21 @@ const unrestEvent = (planetId: PlanetId): Omit<ActiveEvent, 'id'> => ({
     {
       id: 'negotiate',
       label: 'Negotiate',
-      costInfluence: 3,
+      costInfluence: 5, // Was 3 - diplomatic but expensive
       effects: { entropy: -1 },
     },
     {
       id: 'suppress',
       label: 'Suppress',
-      costInfluence: 1,
+      costInfluence: 2, // Was 1 - cheap but draws attention
       effects: { entropy: +3 },
+    },
+    {
+      // Iteration 3: Aggressive option - free but permanent damage
+      id: 'purge',
+      label: 'Purge District',
+      costInfluence: 0,
+      effects: { entropy: +8, incomeModifier: -1 },
     },
     {
       id: 'ignore',
@@ -54,16 +61,23 @@ const rebellionEvent = (planetId: PlanetId): Omit<ActiveEvent, 'id'> => ({
   body: 'Open resistance breaks out. Your influence income from this world is at risk.',
   options: [
     {
+      id: 'concessions',
+      label: 'Concessions',
+      costInfluence: 8, // Was 5 - diplomatic but very expensive
+      effects: { entropy: -2 },
+    },
+    {
       id: 'crackdown',
       label: 'Crack Down',
       costInfluence: 4,
       effects: { entropy: +6 },
     },
     {
-      id: 'concessions',
-      label: 'Concessions',
-      costInfluence: 5,
-      effects: { entropy: -2 },
+      // Iteration 3: Aggressive option - destroy the problem
+      id: 'orbital-strike',
+      label: 'Orbital Strike',
+      costInfluence: 2,
+      effects: { entropy: +15, destroyPlanet: true },
     },
     {
       id: 'abandon',
@@ -238,16 +252,23 @@ const observersEvent = (planetId: PlanetId): Omit<ActiveEvent, 'id'> => ({
       effects: {},
     },
     {
-      id: 'approach',
-      label: 'Approach',
-      costInfluence: 2,
-      effects: { entropy: +3 },
+      // Iteration 3: Concordat deal option
+      id: 'make-deal',
+      label: 'Pay for Peace',
+      costInfluence: 20, // High cost for temporary relief
+      effects: { entropy: -15 }, // Significant entropy reduction
     },
     {
       id: 'hide',
       label: 'Reduce Activity',
       costInfluence: 5,
       effects: { entropy: -5 },
+    },
+    {
+      id: 'approach',
+      label: 'Approach Boldly',
+      costInfluence: 0,
+      effects: { entropy: +5 }, // Draws more attention
     },
   ],
 });
@@ -257,13 +278,20 @@ const emissaryEvent = (planetId: PlanetId): Omit<ActiveEvent, 'id'> => ({
   type: 'emissary',
   planetId,
   title: 'Concordat Emissary',
-  body: 'A representative of the Axiometric Concordat requests audience. They speak of "regulations" and "cosmic stability."',
+  body: 'A representative of the Axiometric Concordat requests audience. They speak of "regulations" and "cosmic stability." They offer a dark bargain...',
   options: [
     {
       id: 'listen',
       label: 'Hear Them Out',
       costInfluence: 0,
       effects: { entropy: -3 },
+    },
+    {
+      // Iteration 3: Dark deal - sacrifice a planet for major entropy reduction
+      id: 'sacrifice-planet',
+      label: 'Sacrifice This World',
+      costInfluence: 0, // Free in influence, but destroys the planet
+      effects: { entropy: -30, destroyPlanet: true },
     },
     {
       id: 'refuse',
